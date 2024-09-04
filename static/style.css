@@ -1,0 +1,33 @@
+/* P.108 부트스트랩을 사용하게 되어 style.css 파일 내용 비움. 
+이후 부투ㅡ스트랩으로 표현할 수 없는 스타일을 위해 사용할 것이므로 파일 자체를 삭제하지는 말고 내용만 삭제하자. */
+/* textarea {
+width:100%;
+}
+
+input[type=submit]{
+margin-top:10px;
+} */
+
+.nabla-custom {
+    font-family: "Nabla", system-ui;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.do-hyeon-regular {
+    font-family: "Do Hyeon", system-ui;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.comment {
+    border-top:dotted 1px #ddd;
+    font-size:0.7em;
+}
+
+.replycomment {
+    border-top:dotted 1px #ddd;
+    font-size:0.7em;
+
+}

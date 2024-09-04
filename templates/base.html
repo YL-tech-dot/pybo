@@ -1,0 +1,33 @@
+{% load static %}
+<!doctype html>
+<html lang="ko">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content= "width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+    <!-- pybo CSS + font family도 넣음. -->
+    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+    <style>@import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Nabla&display=swap');</style>
+    <!-- favicon : 특정 폴더에 넣는 경우 파일 이름에 지정해줘야함. -->
+    <link rel="icon" href="{% static 'image/favicon_sword.ico' %}" >
+    <title>Hello, pybo!</title>
+</head>
+<body>
+<!--include 기능 : nav 템플릿의 특정 영역 중복, 반복 사용시 유용.-->
+{% include "navbar.html" %}
+<!-- 기본 템플릿 안에 삽입될 내용 Start -->
+{% block content %}
+{% endblock %}
+<!-- 기본 템플릿 안에 삽입될 내용 End -->
+<!-- jquery-3.4.1. JS -->
+<script src="{% static 'jquery-3.4.1.min.js' %}"></script>
+<!-- Bootstrap JS -->
+<script src="{% static 'bootstrap.min.js' %}"></script>
+<!-- 자바 스크립트 Start-->
+{% block script %}
+{% endblock %}
+<!-- 자바 스크립트 End-->
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!-- profile.html -->
+<html>
+<head>
+    <title>Profile</title>
+</head>
+<body>
+    <h1>{{ profile.name }}</h1>
+
+
+    {% if profile.is_active %}
+        <p>{{ profile.bio }}</p>
+    {% else %}
+        <p>This account is inactive.</p>
+    {% endif %}
+
+
+    <p>Account created on: {{ profile.created_at|date:"F j, Y" }}</p>
+
+
+    {% if profile.has_special_permissions %}
+        <p>User has special permissions.</p>
+    {% endif %}
+</body>
+</html>
