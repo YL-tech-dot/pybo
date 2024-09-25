@@ -17,8 +17,8 @@ import io
 import shutil
 from pathlib import Path
 import warnings
-# from django.http import HttpResponse # 사용자가 볼 수 있는 httpresponse
-# from django.conf import settings     # 기존 Path 모듈을 대체한 settings. 장고에서 url 관련을 나타낼때는 path보다 이 모듈을 사용한다고 함.
+
+
 #
 # =========================
 # 로깅 및 경고 설정
@@ -31,6 +31,8 @@ def setup_warnings_and_logging():
     warnings.filterwarnings("ignore", category=UserWarning)
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     #
+
+
 #
 # =========================
 # 이미지 처리 함수들
@@ -39,7 +41,7 @@ def resize_image_with_padding(image, target_size):
     """이미지를 리사이즈하고 패딩을 추가하는 함수
 
     주어진 크기에 맞게 이미지를 리사이즈하고, 남은 공간을 패딩으로 채운다.
-    
+
     Args:
         image: 원본 이미지 배열
         target_size: 목표 이미지 크기
@@ -64,12 +66,14 @@ def resize_image_with_padding(image, target_size):
     #
     return new_img, scale, top, left
     #
+
+
 #
 def draw_korean_text(config, image, text, position, font_size, font_color=(255, 255, 255), background_color=(0, 0, 0)):
     """이미지에 한글 텍스트를 그리는 함수
 
     주어진 위치에 한글 텍스트를 이미지에 그린다.
-    
+
     Args:
         config: 폰트 경로를 포함하는 설정 객체
         image: 원본 이미지 배열
@@ -121,12 +125,14 @@ def draw_korean_text(config, image, text, position, font_size, font_color=(255, 
     #
     return np.array(img_pil)
     #
+
+
 #
 def extend_image_with_text(config, image, text, font_size, font_color=(255, 255, 255), background_color=(0, 0, 0)):
     """이미지를 확장하고 텍스트를 추가하는 함수
 
     이미지 위쪽에 텍스트가 들어갈 공간을 추가하고, 텍스트를 그린다.
-    
+
     Args:
         config: 폰트 경로를 포함하는 설정 객체
         image: 원본 이미지 배열
@@ -159,12 +165,14 @@ def extend_image_with_text(config, image, text, font_size, font_color=(255, 255,
     #
     return np.array(extended_image_pil)
     #
+
+
 #
 def copy_image_and_add_metadata(image_path, output_folder):
     """이미지를 복사하고 메타데이터를 추가하는 함수
 
     이미지 파일을 복사한 후 Exif 메타데이터를 추가한다.
-    
+
     Args:
         image_path: 원본 이미지 경로
         output_folder: 복사된 이미지가 저장될 폴더 경로
@@ -221,11 +229,12 @@ def copy_image_and_add_metadata(image_path, output_folder):
         meta_im.save(copied_image_path, exif=exif_bytes)
         logging.info(f"이미지가 저장되었습니다. {copied_image_path}")
 
+
 def print_image_exif_data(image_path):
     """이미지의 Exif 데이터를 출력하는 함수
 
     이미지 파일에서 Exif 데이터를 읽고 출력한다.
-    
+
     Args:
         image_path: 이미지 파일 경로
     """
@@ -233,11 +242,12 @@ def print_image_exif_data(image_path):
         exif_data = piexif.load(im.info['exif'])
         print(exif_data)
 
+
 def draw_face_boxes(image, faces, color=(0, 255, 0), thickness=2):
     """얼굴 주위에 바운딩박스를 그리는 함수
 
     얼굴 좌표를 기반으로 이미지를 사각형으로 표시한다.
-    
+
     Args:
         image: 원본 이미지 배열
         faces: 얼굴 좌표 리스트
@@ -250,6 +260,7 @@ def draw_face_boxes(image, faces, color=(0, 255, 0), thickness=2):
     for (x, y, w, h) in faces:
         cv2.rectangle(image, (x, y), (w, h), color, thickness)
 
+
 # =========================
 # 추상화: AI Model 인터페이스
 # =========================
@@ -258,31 +269,34 @@ class AIModel(ABC):
     def __init__(self, model_path):
         """
         모델을 로드하는 메서드
-        
+
         모델을 불러오는 중 예외가 발생할 수 있으므로 try-except 구문을 사용하여
-        모델 로드 중 발생하는 예외를 처리하고 로깅한다. 
-        
+        모델 로드 중 발생하는 예외를 처리하고 로깅한다.
+
         로드에 실패한 경우 None을 반환하도록 구현.
-        
+
         구체적 구현은 하위 클래스에서 제공.
-        
+
         추상 메서드로 설정하여 하위 클래스에서 강제적으로 구현되도록 함.
         """
         pass
         #
+
     #
     @abstractmethod
     def predict(self, image, image_path=None):
         """
         이미지 또는 이미지 경로를 입력받아 얼굴 좌표를 예측하는 메서드.
-        
+
         각 모델마다 반환하는 얼굴 좌표의 형식이 다르므로, 추상화를 통해 통일된 형식으로 반환하도록 구현.
-        
+
         구체적 구현은 하위 클래스에서 제공.
         """
         pass
         #
     #
+
+
 #
 # =========================
 # Dlib 모델 Face Detector 구현
@@ -301,17 +315,20 @@ class DlibFaceDetector(AIModel):
             self.detector = None
             #
         #
+
     #
-    def predict(self, image, image_path=None):
+    def predict(self, image):
         """Dlib을 이용해 이미지에서 얼굴을 탐지"""
         if self.detector is None:
             logging.error("Dlib 모델이 로드되지 않았습니다.")
             return []
-        
+
         # Dlib 얼굴 탐지기 실행, 얼굴 좌표 반환
         return [(d.rect.left(), d.rect.top(), d.rect.right(), d.rect.bottom()) for d in self.detector(image, 1)]
         #
     #
+
+
 #
 # =========================
 # YOLO 모델 Face Detector 구현
@@ -319,7 +336,6 @@ class DlibFaceDetector(AIModel):
 class YOLOFaceDetector(AIModel):
     def __init__(self, model_path):
         """YOLO 얼굴 탐지 모델 로드"""
-        print('This is YOLO====================================>')
         try:
             logging.info(f"YOLO 모델 로드 중: {model_path}")
             self.detector = YOLO(model_path)
@@ -331,24 +347,28 @@ class YOLOFaceDetector(AIModel):
             self.detector = None
             #
         #
+
     #
-    def predict(self,image_path, image=None ):
+    def predict(self, image_path):
         """YOLO을 이용해 이미지에서 얼굴을 탐지"""
         if self.detector is None:
             logging.error("YOLO 모델이 로드되지 않았습니다.")
             return []
-        
+
         # YOLO 모델을 통해 얼굴 탐지, 좌표 반환
         results = self.detector.predict(image_path, conf=0.35, imgsz=1280, max_det=1000)
-        return [(int(box.xyxy[0][0]), int(box.xyxy[0][1]), int(box.xyxy[0][2]), int(box.xyxy[0][3])) for result in results for box in result.boxes]
+        return [(int(box.xyxy[0][0]), int(box.xyxy[0][1]), int(box.xyxy[0][2]), int(box.xyxy[0][3])) for result in
+                results for box in result.boxes]
         #
     #
+
+
 #
 # =========================
 # MTCNN 모델 Face Detector 구현
 # =========================
 class MTCNNFaceDetector(AIModel):
-    def __init__(self, model_path=None):
+    def __init__(self):
         """MTCNN 얼굴 탐지 모델 로드"""
         try:
             logging.info(f"MTCNN 모델 로드 중...")
@@ -361,17 +381,21 @@ class MTCNNFaceDetector(AIModel):
             self.detector = None
             #
         #
+
     #
-    def predict(self, image, image_path=None):
+    def predict(self, image):
         """MTCNN을 이용해 이미지에서 얼굴을 탐지"""
         if self.detector is None:
             logging.error("MTCNN 모델이 로드되지 않았습니다.")
             return []
-        
+
         # MTCNN 모델을 통해 얼굴 탐지, 좌표 반환
-        return [(f['box'][0], f['box'][1], f['box'][0] + f['box'][2], f['box'][1] + f['box'][3]) for f in self.detector.detect_faces(image)]
+        return [(f['box'][0], f['box'][1], f['box'][0] + f['box'][2], f['box'][1] + f['box'][3]) for f in
+                self.detector.detect_faces(image)]
         #
     #
+
+
 #
 # =========================
 # FairFace 모델 Face Predictor 구현
@@ -383,21 +407,22 @@ class FairFacePredictor(AIModel):
             # GPU가 있다면 GPU를 사용하고, 그렇지 않으면 CPU를 사용
             self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
             logging.info(f"FairFace 모델 load 중: {model_path}")
-            
+
             # ResNet34 모델을 로드하여 마지막 레이어를 수정 (18개 클래스)
             model = models.resnet34(pretrained=True)
             model.fc = nn.Linear(model.fc.in_features, 18)
             model.load_state_dict(torch.load(model_path, map_location=self.device))
             self.model = model.to(self.device).eval()
-            
+
             logging.info("FairFace 모델 load 완료")
         except Exception as e:
             logging.error(f"FairFace 모델 로드 중 오류 발생: {e}")
             self.model = None
             #
         #
+
     #
-    def predict(self, face_image, image_path=None):
+    def predict(self, face_image):
         """FairFace 모델을 사용하여 얼굴 이미지로부터 인종, 성별, 나이를 예측"""
         # 이미지를 FairFace 모델의 입력 크기에 맞게 전처리
         trans = transforms.Compose([
@@ -406,57 +431,62 @@ class FairFacePredictor(AIModel):
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
-        
+
         try:
             face_image = trans(face_image).unsqueeze(0).to(self.device)
         except ValueError:
             logging.error("이미지가 너무 작거나 손상됨, 예측 건너뜀.")
             return None
-        
+
         # 예측 실행
         with torch.no_grad():
             outputs = self.model(face_image).cpu().numpy().squeeze()
-        
+
         # 예측 결과를 바탕으로 인종, 성별, 나이를 추론
         race_pred = np.argmax(outputs[:4])  # 인종 예측
         gender_pred = np.argmax(outputs[7:9])  # 성별 예측
         age_pred = np.argmax(outputs[9:18])  # 나이 예측
-        
+
         race_text = ['백인', '흑인', '아시아', '중동'][race_pred]
         gender_text, box_color = [('남성', (50, 100, 255)), ('여성', (255, 100, 50))][gender_pred]
         age_text = ['영아', '유아', '10대', '20대', '30대', '40대', '50대', '60대', '70+'][age_pred]
-        
+
         # 예측 결과를 딕셔너리로 반환
         return {"race": race_text, "gender": gender_text, "box_color": box_color, "age": age_text}
         #
     #
+
+
 #
 # =========================
 # 추상화: Model 관리자 클래스
 # =========================
 class ModelManager(ABC):
     @abstractmethod
-    def __init__(self, model_path=None):
+    def __init__(self, model_path):
         """
-        모델 매니저 클래스의 생성자. 
-        
+        모델 매니저 클래스의 생성자.
+
         이 메서드는 하위 클래스에서 모델 로드 및 초기화를 처리하도록 추상화되어 있음.
-        
+
         하위 클래스에서 구체적 구현을 제공해야 함.
         """
         pass
         #
+
     #
     @abstractmethod
     def manage_prediction(self, image, image_path=None):
         """
         모델을 통해 예측을 관리하는 메서드.
-        
+
         이 메서드는 하위 클래스에서 구체적 예측 로직을 구현하도록 추상화되어 있음.
         """
         pass
         #
     #
+
+
 #
 # =========================
 # FaceDetector 관리자 클래스
@@ -466,26 +496,26 @@ class FaceDetectors(ModelManager):
         """탐지기들을 받아 관리하는 클래스 생성자"""
         self.detectors = detectors  # 여러 얼굴 탐지기를 리스트로 저장
         #
+
     #
     def manage_prediction(self, image, image_path=None):
         """
         모든 탐지기를 사용하여 얼굴을 탐지하고, 비최대 억제(NMS)를 적용하여 중복된 얼굴 영역을 제거함.
-        
+
         YOLO 탐지기의 경우 이미지 경로를, 나머지 탐지기의 경우 이미지를 입력으로 사용하여 얼굴을 탐지.
         """
         logging.info("얼굴 탐지 시작...")
-        faces = int  # 모든 탐지 결과를 저장할 리스트
         all_faces = []  # 모든 탐지 결과를 저장할 리스트
         for detector in self.detectors:
             try:
                 # YOLO 탐지기의 경우 이미지 경로를 사용하여 탐지
-                if isinstance(detector, YOLOFaceDetector) and image_path: 
+                if isinstance(detector, YOLOFaceDetector) and image_path:
                     faces = detector.predict(image_path)
                 else:
                     # 그 외 탐지기의 경우 이미지를 사용하여 탐지
                     faces = detector.predict(image)
             except Exception as e:
-                logging.error(f"\n얼굴 탐지중 오류 발생: {e}")
+                logging.error(f"얼굴 탐지 중 오류 발생: {e}")
                 raise
             finally:
                 logging.info(f"{detector} : {len(faces)}개의 얼굴 검출")
@@ -499,6 +529,7 @@ class FaceDetectors(ModelManager):
         # 비최대 억제(NMS)를 적용하여 중복된 얼굴 영역을 제거한 결과 반환
         return self._apply_non_max_suppression(all_faces)
         #
+
     #
     @staticmethod
     def _apply_non_max_suppression(faces):
@@ -539,6 +570,8 @@ class FaceDetectors(ModelManager):
         return boxes[pick].astype("int").tolist()  # 최종 선택된 얼굴 영역 반환
         #
     #
+
+
 #
 # =========================
 # FacePredictor 관리자 클래스
@@ -548,8 +581,9 @@ class FacePredictors(ModelManager):
         """예측기들을 받아 관리하는 클래스 생성자"""
         self.predictors = predictors  # 여러 얼굴 예측기를 리스트로 저장
         #
+
     #
-    def manage_prediction(self, image,image_path=None):
+    def manage_prediction(self, image):
         """
         모든 예측기를 사용하여 얼굴 예측을 수행하고, 예측 결과를 통합하여 반환.
         """
@@ -564,6 +598,8 @@ class FacePredictors(ModelManager):
             all_predictions.update(prediction)  # 예측 결과를 통합
         logging.info(f"예측 결과: {all_predictions}")
         return all_predictions  # 최종 예측 결과 반환
+
+
 # =========================
 # 얼굴 인식 시스템 클래스
 # 기존의 advanced project 의 로직
@@ -572,7 +608,7 @@ class AiSystem:
     def __init__(self, config, detector_manager, predictor_manager):
         """
         얼굴 인식 시스템 초기화. config 설정, 탐지기 및 예측기 관리자를 초기화함.
-        
+
         :param config: 시스템 설정 정보
         :param detector_manager: 얼굴 탐지기 관리자
         :param predictor_manager: 얼굴 예측기 관리자
@@ -581,71 +617,63 @@ class AiSystem:
         self.detector_manager = detector_manager
         self.predictor_manager = predictor_manager
         #
+
     #
     def process_image(self, image_path, target_encodings):
         """
         이미지를 처리하고 얼굴 탐지 및 예측을 수행한 후 결과를 저장.
-        
+
         :param image_path: 처리할 이미지 경로
         :param target_encodings: 타겟 얼굴 인코딩
         """
         try:
-            print('===Thisis AiSystem:process-image====================================')
-            print('\ntarget_encodings ====>',target_encodings)
-            print('\nimage_path ====>',image_path)
-            print('=======================================')
             image_rgb, faces = self._detect_faces(image_path)  # 얼굴 탐지
-            print('=======================================')
-            print('\nimage_rgb, faces ====>',image_rgb)
-            print('\nfaces ====>',faces)
-            print('===End AiSystem:process-image========')
-            predictions, face_cnt, race_cnt, male_cnt = self._complicate_predictions(image_rgb, faces, target_encodings)  # 얼굴 예측
+            print('faces==============================', faces)
+            predictions, face_cnt, race_cnt, male_cnt = self._complicate_predictions(image_rgb, faces,target_encodings)  # 얼굴 예측
             result_image = self._draw_results(image_rgb, predictions, face_cnt, male_cnt, race_cnt)  # 결과 그리기
             self._save_results(image_path, result_image, predictions)  # 결과 저장
-
         except Exception as e:
-            logging.error(f"이미지 처리중 오류 발생: {e}")
+            logging.error(f"이미지 처리 중 오류 발생: {e}")
         #
+
     #
     def _detect_faces(self, image_path):
         """
         이미지에서 얼굴을 탐지하는 메서드.
-        
+
         :param image_path: 이미지 경로
         :return: RGB 이미지 및 얼굴 좌표
         """
         try:
-            image = cv2.imread(image_path)  # 이미지 읽기 numpy 배열
-            if image is None: 
+            image = cv2.imread(image_path)  # 이미지 읽기
+            if image is None:
                 raise ValueError(f"이미지를 읽을 수 없습니다: {image_path}")
             image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # RGB로 변환
-            print('===============LYE:This Area is AiSystem Printing================')
-            print('self.detector_manager : checking----------------')
-            print('printing---->',self.detector_manager)
-            print('printing---->type:',type(self.detector_manager))
-            print('============================================')
             faces = self.detector_manager.manage_prediction(image_rgb, image_path)  # 얼굴 탐지
             logging.info(f"얼굴 탐지 완료: {len(faces)}명")
             return image_rgb, faces  # RGB 이미지와 얼굴 좌표 반환
         except Exception as e:
-            logging.error(f"얼굴 탐지중 오류 발생: {e}")
+            logging.error(f"얼굴 탐지 중 오류 발생: {e}")
             raise
         #
+
     #
-    def _complicate_predictions(self, image_rgb:np.ndarray, faces, target_encodings):
+    def _complicate_predictions(self, image_rgb, faces, target_encodings):
         """
         얼굴 예측 결과를 집계하여 반환.
-        
+
         :param image_rgb: RGB로 변환된 이미지
         :param faces: 얼굴 좌표
         :param target_encodings: 타겟 얼굴 인코딩
         :return: 예측 결과, 얼굴 개수, 인종별 개수, 남성 개수
         """
+        print('==============================\nfaces\n==========================', faces)
         predictions = []
         face_cnt = 0
         race_cnt = {'백인': 0, '흑인': 0, '아시아': 0, '중동': 0}
         male_cnt = 0
         for face in faces:
+            print(face)
             prediction = self._predict_face(image_rgb, face, target_encodings)
             if prediction:
                 predictions.append(prediction)
@@ -660,11 +688,12 @@ class AiSystem:
         #
         return predictions, face_cnt, race_cnt, male_cnt
         #
+
     #
-    def _predict_face(self, image_rgb:np.ndarray, face, target_encodings):
+    def _predict_face(self, image_rgb, face, target_encodings):
         """
         단일 얼굴에 대해 예측을 수행하고 결과를 반환.
-        
+
         :param image_rgb: RGB 이미지
         :param face: 얼굴 좌표
         :param target_encodings: 타겟 얼굴 인코딩
@@ -673,7 +702,7 @@ class AiSystem:
         try:
             x, y, x2, y2 = face  # 얼굴 좌표
             face_image = image_rgb[y:y2, x:x2]  # 얼굴 이미지
-            encodings = face_recognition.face_encodings(image_rgb, [(y, x + (x2 - x), y + (y2 - y), x)])  # 이미지 데이터 numpy 배열, 좌표 = Tuple
+            encodings = face_recognition.face_encodings(image_rgb, [(y, x + (x2 - x), y + (y2 - y), x)])  # 얼굴 인코딩
             if not encodings:
                 logging.warning(f"얼굴 인코딩 실패: {face}")
                 return None
@@ -686,14 +715,15 @@ class AiSystem:
             prediction_text = '가카!' if is_gaka and gender_text == '남성' else age_text  # 예측 텍스트
             return x, y, x2 - x, y2 - y, race_text, gender_text, box_color, prediction_text
         except Exception as e:
-            logging.error(f"단일 얼굴 처리중 오류 발생: {e}")
+            logging.error(f"단일 얼굴 처리 중 오류 발생: {e}")
             return None
         #
+
     #
-    def _draw_results(self, image_rgb:np.ndarray, predictions, face_cnt:int, male_cnt:int, race_cnt:dict):
+    def _draw_results(self, image_rgb, predictions, face_cnt, male_cnt, race_cnt):
         """
         예측 결과를 이미지에 그려서 반환.
-        
+
         :param image_rgb: RGB 이미지
         :param predictions: 얼굴 예측 결과
         :param face_cnt: 검출된 얼굴 수
@@ -703,23 +733,25 @@ class AiSystem:
         """
         font_size = max(12, int(image_rgb.shape[1] / 200))  # 폰트 크기 설정
         image_rgb, scale, top, left = resize_image_with_padding(image_rgb, 512)  # 이미지 리사이즈
-        for x, y, w, h, _, _, box_color, prediction_text in predictions: 
+        for x, y, w, h, _, _, box_color, prediction_text in predictions:
             x = int(x * scale) + left
             y = int(y * scale) + top
             w = int(w * scale)
             h = int(h * scale)
-            image_rgb = draw_korean_text(self.config, image_rgb, prediction_text, (x, y), 15, font_color=(0, 0, 0), background_color=box_color)
+            image_rgb = draw_korean_text(self.config, image_rgb, prediction_text, (x, y), 15, font_color=(0, 0, 0),
+                                         background_color=box_color)
             image_rgb = cv2.rectangle(image_rgb, (x, y), (x + w, y + h), box_color, 2)
         info_text = f"검출된 인원 수: {face_cnt}명\n남성: {male_cnt}명\n여성: {face_cnt - male_cnt}명\n"
         race_info = "\n".join([f"{race}: {count}명" for race, count in race_cnt.items() if count > 0])
         image_rgb = extend_image_with_text(self.config, image_rgb, info_text + race_info, font_size)
         return image_rgb
         #
+
     #
-    def _save_results(self, image_path:str, image_rgb:np.ndarray, predictions):
+    def _save_results(self, image_path, image_rgb, predictions):
         """
         처리된 결과 이미지를 저장하고 메타데이터를 추가함.
-        
+
         :param image_path: 원본 이미지 경로
         :param image_rgb: 처리된 이미지
         :param predictions: 예측 결과
@@ -727,41 +759,39 @@ class AiSystem:
         try:
             output_path = os.path.join(self.config['results_folder'], os.path.basename(image_path))  # 결과 이미지 경로
             cv2.imwrite(output_path, cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR))  # 이미지 저장
-            logging.info(f"이미지 분석 결과 저장: {output_path}") 
+            logging.info(f"이미지 분석 결과 저장: {output_path}")
             gaka_detected = any("가카" in pred[7] for pred in predictions)  # 가카 여부 확인
             detection_folder = "detection_target" if gaka_detected else "detection_non_target"  # 타겟 여부 폴더 설정
             output_folder = os.path.join(self.config['results_folder'], detection_folder)  # 결과 폴더 생성
             copy_image_and_add_metadata(image_path, output_folder)  # 이미지 복사 및 메타데이터 추가
-            logging.info(f"메타데이터 추가된 이미지 저장: {output_folder}") 
+            logging.info(f"메타데이터 추가된 이미지 저장: {output_folder}")
         except Exception as e:
             logging.error(f"결과 저장 중 오류 발생: {e}")
         #
     #
+
+
 #
 # =========================
 # 얼굴 인식 시스템 클래스 for Django
 # =========================
 class ForDjango(AiSystem):
     def __init__(self, config, detector_manager, predictor_manager):
-        super().__init__(config, detector_manager, predictor_manager)
         """
         Django 환경에서 동작할 얼굴 인식 시스템 초기화.
-        
+
         :param config: 시스템 설정 정보
         :param detector_manager: 얼굴 탐지기 관리자
         :param predictor_manager: 얼굴 예측기 관리자
-
-        super()를 사용하여 부모 클래스인 AiSystem의 __init__ 메서드를 호출합니다.
-        이 호출은 ForDjango 클래스의 초기화 과정에서 부모 클래스의 초기화 메서드도 실행하도록 합니다.
-        config, detector_manager, predictor_manager는 AiSystem 클래스의 __init__ 메서드로 전달됩니다.
-        이는 부모 클래스가 필요한 초기화 작업을 수행할 수 있게 합니다.
         """
+        super().__init__(config, detector_manager, predictor_manager)
         #
+
     #
     def process_image(self, image_path, target_encodings):
         """
         이미지에서 얼굴을 탐지하고 결과를 저장하는 메서드.
-        
+
         :param image_path: 처리할 이미지 경로
         :param target_encodings: 타겟 얼굴 인코딩
         :return: Django에서 사용할 수 있는 이미지 경로
@@ -769,7 +799,8 @@ class ForDjango(AiSystem):
         try:
             image_rgb, faces = self._detect_faces(image_path)  # 얼굴 탐지
             if self.predictor_manager:  # 예측기가 설정된 경우
-                predictions, face_cnt, race_cnt, male_cnt = self._complicate_predictions(image_rgb, faces, target_encodings)  # 얼굴 예측
+                predictions, face_cnt, race_cnt, male_cnt = self._complicate_predictions(image_rgb, faces,
+                                                                                         target_encodings)  # 얼굴 예측
             else:
                 predictions, face_cnt, race_cnt, male_cnt = faces, f'{len(faces)}', None, None
             result_image = self._draw_results(image_rgb, predictions, face_cnt, male_cnt, race_cnt)  # 결과 그리기
@@ -778,16 +809,17 @@ class ForDjango(AiSystem):
             logging.info(f"이미지 분석 결과 저장: {output_path}")
 
             # Django에서 사용할 수 있는 이미지 경로로 변환
-            django_path = os.path.join('pybo/ai_image_answer', os.path.basename(output_path))
+            django_path = os.path.join('pybo/answer_image', os.path.basename(output_path))
             return django_path
         except Exception as e:
-            logging.error(f"이미지 처리중 오류 발생: {e}")
+            logging.error(f"이미지 처리 중 오류 발생: {e}")
         #
+
     #
     def _draw_results(self, image_rgb, predictions, face_cnt, male_cnt, race_cnt):
         """
         예측 결과를 이미지에 그리는 메서드.
-        
+
         :param image_rgb: RGB로 변환된 이미지
         :param predictions: 얼굴 예측 결과
         :param face_cnt: 얼굴 개수
@@ -811,7 +843,7 @@ class ForDjango(AiSystem):
             info_text = f"검출된 인원 수: {face_cnt}명\n남성: {male_cnt}명\n여성: {face_cnt - male_cnt}명\n"
             race_info = "\n".join([f"{race}: {count}명" for race, count in race_cnt.items() if count > 0])
         #
-        except FileNotFoundError:
+        except Exception as e:
             # 예측 결과가 없을 경우 기본 결과 그리기
             for x, y, x2, y2 in predictions:
                 w, h = x2 - x, y2 - y
@@ -828,11 +860,12 @@ class ForDjango(AiSystem):
         image_rgb = extend_image_with_text(self.config, image_rgb, info_text + race_info, font_size)
         return image_rgb
         #
+
     #
     def _save_results(self, image_path, result_image, predictions=None):
         """
         결과 이미지를 저장하는 메서드.
-        
+
         :param image_path: 원본 이미지 경로
         :param result_image: 처리된 결과 이미지
         :param predictions: 예측 결과 (Optional)
@@ -843,17 +876,44 @@ class ForDjango(AiSystem):
         cv2.imwrite(output_path, cv2.cvtColor(result_image, cv2.COLOR_RGB2BGR))  # 이미지 저장
         logging.info(f"이미지 분석 결과 저장: {output_path}")
         return output_path
+        #
+    #
 
 
-class DetectorManager:
-    def __init__(self, detectors=None):
-        self.detectors = detectors or []
+#
+# =========================
+# Django 시스템 설정 데코레이터
+# =========================
+def setup_django_system(func):
+    """
+    설정 및 시스템 초기화를 처리하는 데코레이터.
 
-    @staticmethod
-    def load_detectors(selected_detectors, config):
-        """
-        사용자가 주문한(요청) detector를 생성하여 반환하는 메서드.
-        """
+    Django에서 AI 시스템을 사용하기 위한 설정을 초기화하고,
+    사용자 요청에 따라 탐지기 및 예측기를 설정하여 시스템을 실행.
+    """
+
+    def wrapper(request, image_path, *args, **kwargs):
+        # 경고 및 로깅 설정
+        setup_warnings_and_logging()
+        #
+        # 설정 파일 로드
+        base_dir = os.path.join(Path(__file__).resolve().parent, 'ai_files')
+        django_media_dir = os.path.join(Path(__file__).resolve().parent.parent.parent, 'media/pybo/answer_image')
+        config = {
+            "dlib_model_path": os.path.join(base_dir, 'ai_models', 'DilbCNN', 'mmod_human_face_detector.dat'),
+            "yolo_model_path": os.path.join(base_dir, 'ai_models', 'YOLOv8', 'yolov8n-face.pt'),
+            "fair_face_model_path": os.path.join(base_dir, 'ai_models', 'FairFace', 'resnet34_fair_face_4.pt'),
+            "image_folder": os.path.join(base_dir, 'image_test', 'test_park_mind_problem'),
+            "pickle_path": os.path.join(base_dir, 'embedings', 'FaceRecognition(ResNet34).pkl'),
+            "font_path": os.path.join(base_dir, 'fonts', 'NanumGothic.ttf'),
+            "results_folder": django_media_dir,
+        }
+        #
+        # 사용자가 선택한 탐지기 및 예측기를 설정
+        selected_detectors = request.POST.getlist('detectors')  # 여러 탐지기 선택 가능
+        selected_predictors = request.POST.getlist('predictors')  # 여러 예측기 선택 가능
+        #
+        # 얼굴 탐지기 설정
         detectors = []
         if 'dlib' in selected_detectors:
             detectors.append(DlibFaceDetector(config['dlib_model_path']))
@@ -861,105 +921,41 @@ class DetectorManager:
             detectors.append(YOLOFaceDetector(config['yolo_model_path']))
         if 'mtcnn' in selected_detectors:
             detectors.append(MTCNNFaceDetector())
-        if selected_detectors is None:
-            logging.warning("탐색기가 선택되지 않았습니다. 탐색기 작업을 건너뜁니다.")
+        #
+        # 탐지기가 선택되지 않은 경우
+        if not detectors:
+            logging.warning("탐지기가 선택되지 않았습니다. 탐지 작업을 건너뜁니다.")
             detector_manager = None
-            return detector_manager
-        detector_manager = FaceDetectors(*detectors)
-        print('=============This is lyeDetectorManager Printing===========\n탐색기 선택됨.탐색기 선택됨.탐색기 선택됨.탐색기 선택됨.')
-        print('What is FaceDetectors(*detectors)?:',FaceDetectors(*detectors))
-        print('detector_manager --> ',detector_manager)
-        print('detectorstype    --> ',type(detector_manager))
-        print('=============This is lyeDetectorManager End===========')
-        return detector_manager
-
-class PredictorManager:
-    def __init__(self, predictors=None):
-        """predictors가 1개 뿐이기 때문에
-            선택되지 않았을것을 대비하여 None으로 만든다."""
-        self.predictors = predictors or []
-
-    @staticmethod
-    def load_predictors(selected_predictors, config):
-        """
-        사용자가 주문한(요청) predictor를 생성하여 반환하는 메서드.
-        """
+        else:
+            detector_manager = FaceDetectors(*detectors)
+        #
+        # 얼굴 예측기 설정
         predictors = []
         if 'fairface' in selected_predictors:
             predictors.append(FairFacePredictor(config['fair_face_model_path']))
-            print('\nprinting--------------------------------------')
-            print("예측기가 선택되었습니다..")
-            print('printing--------------------------------------\n')
-            return FacePredictors(*predictors)
-
-        if predictors is None:
-            logging.warning("예측기가 선택되지 않았습니다. 예측기 작업을 건너뜁니다.")
+        #
+        # 예측기가 선택되지 않은 경우
+        if not predictors:
+            logging.warning("예측기가 선택되지 않았습니다. 예측 작업을 건너뜁니다.")
             predictor_manager = None
-            return predictor_manager
-
-def load_config():
-    # utils.py 라는 이름 파일로 뺴도 됨. 유지보수관리 기능 등
-    base_dir = os.path.join(Path(__file__).resolve().parent, 'ai_files')
-    django_media_dir = os.path.join(Path(__file__).resolve().parent.parent.parent, 'media/pybo/answer_image')
-    config = {
-        "dlib_model_path": os.path.join(base_dir, 'ai_models', 'DilbCNN', 'mmod_human_face_detector.dat'),
-        "yolo_model_path": os.path.join(base_dir, 'ai_models', 'YOLOv8', 'yolov8n-face.pt'),
-        "fair_face_model_path": os.path.join(base_dir, 'ai_models', 'FairFace', 'resnet34_fair_face_4.pt'),
-        "image_folder": os.path.join(base_dir, 'image_test', 'test_park_mind_problem'),
-        "pickle_path": os.path.join(base_dir, 'embedings', 'FaceRecognition(ResNet34).pkl'),
-        "font_path": os.path.join(base_dir, 'fonts', 'NanumGothic.ttf'),
-        "results_folder": django_media_dir, }
-    return config
-
-# ==========================================
-# 데코레이터 setup_system! ai_view를 초기화 하자.
-# ==========================================
-def setup_system(func):
-    """
-    데코레이터용 ai_view 함수, 시스템을 초기화합니다.
-    Args:
-        func: 설정된 후 호출될 뷰 함수
-    Returns:
-        wrapper 함수
-    """
-    def wrapper(request, image_path:str, *args, **kwargs):
-        logging.info("환경 설정 및 시스템 초기화 시작") # 개발자를 위한 친절한 디버깅코드
-        setup_warnings_and_logging()
-
-        # 사용자가 선택한 모델 가져오기
-        selected_detectors = request.POST.getlist('detectors')      # 여러 탐지기 선택 가능
-        selected_predictors = request.POST.getlist('predictors')    # 여러 예측기 선택 가능
-
-        # config = 모델이름과 경로
-        config = load_config() # 설정 로드 : 일반적으로 함수를 1번만 호출하는 것이 성능에 좋기때문에 지정
-        detector_manager = DetectorManager.load_detectors(selected_detectors, config)       # 탐지기 객체
-        predictor_manager = PredictorManager.load_predictors(selected_predictors, config)   # 예측기 객체
-        """ 하단의 ForDjango는 매개변수 detector_manager, predictor_manager를 list가 아닌
-            ForDjango의 predictor_manager 메소드를 가진 객체로 받아 들이고 있다.
-            
-            추상 클래스 AISystem (부모)의 매개변수 predictor_manager가 
-            ForDjango(자식)에게도 객체로 오기 때문이다. """
-        print('==========LYE Wrapper Printing ==============')
-        print("DetectorManager.load_detectors(selected_detectors, config)")
-        print("-------------------\ndetector_manager ==> :", detector_manager)
-        print("-------------------\ntype             ==> :", type(detector_manager))
-        print("-------------------\npredictor_manager:", predictor_manager)
-        print("===================")
-        # AI 시스템 생성 시스템 초기화
-        ai_system = ForDjango(config, detector_manager = detector_manager, predictor_manager = predictor_manager)
-
+        else:
+            predictor_manager = FacePredictors(*predictors)
+        #
+        # 얼굴 인식 시스템 생성
+        ai_system = ForDjango(config, detector_manager, predictor_manager)
+        #
         # 타겟 얼굴 인코딩 로드
-        try:
-            with open(config['pickle_path'], 'rb') as f:
-                target_encodings = np.array(pickle.load(f))
-
-        except FileNotFoundError as e:
-            logging.error(f"파일을 찾을 수 없습니다: {e}")
-            # return HttpResponse("설정 파일을 찾을 수 없습니다.", status=500)
-            # 원래 함수 실행
+        with open(config['pickle_path'], 'rb') as f:
+            target_encodings = np.array(pickle.load(f))
+        #
+        # 함수 실행
         return func(request, image_path, ai_system, target_encodings, *args, **kwargs)
 
+    #
     return wrapper
+    #
+
+
 #
 # =========================
 # 메인 실행 모듈
@@ -992,7 +988,9 @@ def main():
     )
     #
     # 얼굴 예측기 생성
-    predictor_manager = FacePredictors(FairFacePredictor(config['fair_face_model_path']))
+    predictor_manager = FacePredictors(
+        FairFacePredictor(config['fair_face_model_path'])
+    )
     #
     # 얼굴 인식 시스템 생성
     ai_system = AiSystem(config, detector_manager, predictor_manager)
@@ -1012,8 +1010,9 @@ def main():
         logging.info(f"이미지 처리 완료: {output_path}")
     #
 
+
+#
 if __name__ == "__main__":
     main()
-
-
+#
 
